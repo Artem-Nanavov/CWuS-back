@@ -1,14 +1,22 @@
 import bcrypt from 'bcrypt';
 import pool from '../database/database';
 import {validateEmail} from '../middleware/validinfo';
-import {generateRefreshToken} from '../utils/jwtGenerator';
+import {generateRefreshToken, generateAccessToken} from '../utils/jwtGenerator';
 import { Router, Response, Request } from 'express';
 
 const router = Router();
 
 router.post('/reg', async (req: Request, res: Response) => {
 	try {
-		const { username, email, password } = req.body;
+		const authData = req.header('Authorization');
+
+		if (!authData || authData.trim() === '') {
+			return res.status(401).json({
+				message: 'Values are incorrect',
+			});
+		}
+
+		const { username, email, password } = JSON.parse(authData);
 
 		if (!validateEmail(email)) {
 			return res.status(403).send('Invalid email');
@@ -35,10 +43,12 @@ router.post('/reg', async (req: Request, res: Response) => {
 			bcryptPassword
 		]);
 
-		const refresh_token: string = await generateRefreshToken(newUser.rows[0]._id);
+		const refresh: string = await generateRefreshToken(newUser.rows[0]._id);
+		const access: string = await generateAccessToken(newUser.rows[0]._id);
 
 		return res.status(200).json({
-			refresh_token,
+			access,
+			refresh,
 		});
 	} catch (e) {
 		console.error( e.message );
@@ -49,19 +59,27 @@ router.post('/reg', async (req: Request, res: Response) => {
 
 router.post('/login', async (req: Request, res: Response) => {
 	try {
-		const { email, password } = req.body;
+		const authData = req.header('Authorization');
 
-		if (!validateEmail(email)) {
+		if (!authData || authData.trim() === '') {
+			return res.status(401).json({
+				message: 'Values are incorrect',
+			});
+		}
+
+		const { login, password } = JSON.parse(authData);
+
+		if (!validateEmail(login)) {
 			return res.status(401).send('Invalid email');
 		}
 
 		const user = await pool.query('SELECT * FROM users WHERE email = $1', [
-			email
+			login
 		]);
 
 		if ( user.rows.length === 0 ) {
 			return res.status(401).json({
-				message: 'Email is incorrect',
+				message: 'Values are incorrect',
 			});
 		};
 
@@ -70,14 +88,16 @@ router.post('/login', async (req: Request, res: Response) => {
 		if ( !validPassword ) {
 			return res.status(401).json({
 				error: true,
-				message: 'Password is incorrect',
+				message: 'Values are incorrect',
 			});
 		};
 
-		const refresh_token: string = await generateRefreshToken(user.rows[0]._id);
+		const refresh: string = await generateRefreshToken(user.rows[0]._id);
+		const access: string = await generateAccessToken(user.rows[0]._id);
 
 		res.status(200).json({
-			refresh_token,
+			refresh,
+			access
 		});
 	} catch (e) {
 		console.error( e.message );

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import pool from '../database/database';
 import {validateEmail} from '../middleware/validinfo';
-import {parseAccessToken} from '../utils/jwtGenerator';
+import {generateAccessToken, parseAccessToken} from '../utils/jwtGenerator';
 import { Router, Response, Request } from 'express';
 
 const router = Router();
@@ -39,6 +39,38 @@ router.get('/me', async (req: Request, res: Response) => {
     return res.status(200).json({
       _id: user.rows[0]._id,
       username: user.rows[0].username,
+    });
+  } catch (e) {
+    console.error( e.message );
+
+		res.status(500).send('Server Error');
+  }
+});
+
+router.post('/refresh-tokens', async (req: Request, res: Response) => {
+  try {
+    const token = await req.header('Authorization');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Invalid token',
+      });
+    }
+
+    const decoded = parseAccessToken(token) as {[key: string]: any};
+
+    if (decoded === null) {
+      return res.status(401).json({
+        message: 'Invalid token',
+      });
+    }
+
+    const {user_id} = decoded.payload;
+
+    const access_token = await generateAccessToken(user_id);
+
+    return res.status(200).json({
+      access_token,
     });
   } catch (e) {
     console.error( e.message );

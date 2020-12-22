@@ -1,7 +1,5 @@
-import jwt from 'jsonwebtoken';
+  import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import pool from "../database/database";
-import { logger } from "../logger/logger";
 import jwtConfig from "../configs/jwt.config";
 
 /**
