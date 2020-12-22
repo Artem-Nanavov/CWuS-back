@@ -35,11 +35,6 @@ router.post('/reg', async (req: Request, res: Response) => {
 			bcryptPassword
 		]);
 
-		await pool.query('INSERT INTO freeUsers (username, _id) VALUES ($1, $2)', [
-			username,
-			newUser.rows[0]._id,
-		]);
-
 		const refresh_token: string = await generateRefreshToken(newUser.rows[0]._id);
 
 		return res.status(200).json({
