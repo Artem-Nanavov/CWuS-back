@@ -14,4 +14,5 @@ export const corsOptions = {
 
     return callback( null, true );
   },
+  credentials: true,
 };

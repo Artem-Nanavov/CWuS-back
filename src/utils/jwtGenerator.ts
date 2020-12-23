@@ -1,4 +1,4 @@
-  import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import jwtConfig from "../configs/jwt.config";
 
@@ -33,7 +33,7 @@ const generateRefreshToken = (user_id: string) => {
   return jwt.sign(payload, jwtConfig.refresh.secret, options);
 };
 
-const parseAccessToken = (token: string) => {
+const parseToken = (token: string) => {
   try {
     return jwt.decode(token);
   } catch (e) {
@@ -42,7 +42,7 @@ const parseAccessToken = (token: string) => {
 };
 
 export {
-  parseAccessToken,
+  parseToken,
   generateAccessToken,
   generateRefreshToken,
 };

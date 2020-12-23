@@ -46,6 +46,11 @@ router.post('/reg', async (req: Request, res: Response) => {
 		const refresh: string = await generateRefreshToken(newUser.rows[0]._id);
 		const access: string = await generateAccessToken(newUser.rows[0]._id);
 
+    res.cookie('refresh', refresh, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
 		return res.status(200).json({
 			access,
 			refresh,
@@ -94,6 +99,11 @@ router.post('/login', async (req: Request, res: Response) => {
 
 		const refresh: string = await generateRefreshToken(user.rows[0]._id);
 		const access: string = await generateAccessToken(user.rows[0]._id);
+
+    res.cookie('refresh', refresh, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
 
 		res.status(200).json({
 			refresh,

@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import pool from '../database/database';
-import {validateEmail} from '../middleware/validinfo';
-import {generateAccessToken, parseAccessToken} from '../utils/jwtGenerator';
+import {generateAccessToken, parseToken} from '../utils/jwtGenerator';
 import { Router, Response, Request } from 'express';
+import { logger } from '../logger/logger';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.get('/me', async (req: Request, res: Response) => {
       });
     }
 
-    const decoded = parseAccessToken(token) as {[key: string]: any};
+    const decoded = parseToken(token) as {[key: string]: any};
 
     if (decoded === null) {
       return res.status(401).json({
@@ -41,7 +41,7 @@ router.get('/me', async (req: Request, res: Response) => {
       username: user.rows[0].username,
     });
   } catch (e) {
-    console.error( e.message );
+    logger.error('Server Error', e.message);
 
 		res.status(500).send('Server Error');
   }
@@ -49,7 +49,7 @@ router.get('/me', async (req: Request, res: Response) => {
 
 router.post('/refresh-tokens', async (req: Request, res: Response) => {
   try {
-    const token = await req.header('Authorization');
+    const token = await req.cookies.refresh;
 
     if (!token) {
       return res.status(401).json({
@@ -57,7 +57,7 @@ router.post('/refresh-tokens', async (req: Request, res: Response) => {
       });
     }
 
-    const decoded = parseAccessToken(token) as {[key: string]: any};
+    const decoded = parseToken(token) as {[key: string]: any};
 
     if (decoded === null) {
       return res.status(401).json({
@@ -65,15 +65,28 @@ router.post('/refresh-tokens', async (req: Request, res: Response) => {
       });
     }
 
-    const {user_id} = decoded.payload;
+    const {user_id} = decoded;
 
-    const access_token = await generateAccessToken(user_id);
+    const access = await generateAccessToken(user_id);
 
     return res.status(200).json({
-      access_token,
+      access,
     });
   } catch (e) {
-    console.error( e.message );
+    logger.error('Server Error', e.message);
+
+		res.status(500).send('Server Error');
+  }
+});
+
+router.post('/logout', async (req: Request, res: Response) => {
+  try {
+    res.cookie('refresh', null, {maxAge: 0});
+
+    res.status(200);
+    return res.end();
+  } catch (e) {
+    logger.error('Server Error', e.message);
 
 		res.status(500).send('Server Error');
   }
