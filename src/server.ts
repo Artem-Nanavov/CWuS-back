@@ -2,7 +2,6 @@ import cors from 'cors';
 import http from 'http';
 import bodyParser from 'body-parser';
 import authRouter from './routes/auth';
-import isAuthRouter from './routes/isAuth';
 import meRouter from './routes/user';
 import express, { Express, NextFunction } from 'express';
 import { corsOptions } from "./middleware/cors";
@@ -10,7 +9,6 @@ import { logger, httpLogger } from "./logger/logger";
 import cookieParser from 'cookie-parser';
 import {Socket, Server} from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
-
 
 const app: Express = express();
 const server = http.createServer(app);
@@ -28,7 +26,6 @@ app.use(httpLogger);
 
 app.use('/auth', authRouter);
 app.use('/user', meRouter);
-app.use('/isAuth', isAuthRouter);
 
 io.use((socket, next) => {
   if (!!socket.request.headers['authorization']) {

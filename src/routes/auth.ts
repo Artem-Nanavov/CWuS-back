@@ -1,3 +1,4 @@
+import { logger } from './../logger/logger';
 import bcrypt from 'bcrypt';
 import pool from '../database/database';
 import {validateEmail} from '../middleware/validinfo';
@@ -8,6 +9,7 @@ const router = Router();
 
 router.post('/reg', async (req: Request, res: Response) => {
 	try {
+		logger.info('reg data', req.header('Authorization'));
 		const authData = req.header('Authorization');
 
 		if (!authData || authData.trim() === '') {
@@ -56,7 +58,7 @@ router.post('/reg', async (req: Request, res: Response) => {
 			refresh,
 		});
 	} catch (e) {
-		console.error( e.message );
+		logger.error('auth login error', e.message)
 
 		res.status(500).send('Server Error');
 	}
@@ -64,6 +66,7 @@ router.post('/reg', async (req: Request, res: Response) => {
 
 router.post('/login', async (req: Request, res: Response) => {
 	try {
+		logger.info('login data', req.header('Authorization'));
 		const authData = req.header('Authorization');
 
 		if (!authData || authData.trim() === '') {
@@ -110,7 +113,7 @@ router.post('/login', async (req: Request, res: Response) => {
 			access
 		});
 	} catch (e) {
-		console.error( e.message );
+		logger.error('auth login error', e.message)
 
 		res.status(500).send('Server Error');
 	};
