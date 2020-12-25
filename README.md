@@ -9,7 +9,7 @@ Or leave it empty and use the [here][postgreSQL link].
 
 first time
 Run: `npm i`
-Run: `knex migrate:up`
+Run: `knex migrate:latest`
 Run: `npm run dev`
 
 API port:       8000

@@ -55,7 +55,6 @@ router.post('/reg', async (req: Request, res: Response) => {
 
 		return res.status(200).json({
 			access,
-			refresh,
 		});
 	} catch (e) {
 		logger.error('auth login error', e.message)
@@ -109,7 +108,6 @@ router.post('/login', async (req: Request, res: Response) => {
     });
 
 		res.status(200).json({
-			refresh,
 			access
 		});
 	} catch (e) {
