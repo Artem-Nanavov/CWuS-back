@@ -3,7 +3,7 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import authRouter from './routes/auth';
 import meRouter from './routes/user';
-import express, { Express, NextFunction } from 'express';
+import express, { Express } from 'express';
 import { corsOptions } from "./middleware/cors";
 import { logger, httpLogger } from "./logger/logger";
 import cookieParser from 'cookie-parser';
