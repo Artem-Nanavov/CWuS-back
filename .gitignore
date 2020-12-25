@@ -6,6 +6,7 @@ node_modules/
 error-file.log
 http-file.log
 info-file.log
+dist
 
 # testing
 /coverage
