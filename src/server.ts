@@ -8,7 +8,7 @@ import { corsOptions } from "./middleware/cors";
 import { logger, httpLogger } from "./logger/logger";
 import cookieParser from 'cookie-parser';
 import {Socket, Server} from 'socket.io';
-import { ExtendedError } from 'socket.io/dist/namespace';
+import { newUser, newMessage, getAllMsgs } from './sockets/chat';
 
 const app: Express = express();
 const server = http.createServer(app);
@@ -27,17 +27,23 @@ app.use(httpLogger);
 app.use('/auth', authRouter);
 app.use('/user', meRouter);
 
-io.use((socket, next) => {
-  if (!!socket.request.headers['authorization']) {
-    return next(new Error('not authorized'));
-  }
+// io.use((socket, next) => {
+//   const token = socket.request.headers['authorization'];
 
-  next();
-});
+//   if (!token || token.trim() === 'null') {
+//     return next(new Error('not authorized'));
+//   }
+
+//   next();
+// });
 
 io.on('connection', async (socket: Socket) => {
-  console.log(socket.request.headers['authorization']);
   console.log('socket connect');
+  socket.on('new user', (username: string) => newUser(socket, username));
+
+  socket.on('new message', (msg: any) => newMessage(socket, msg));
+
+  socket.emit('connect to chat', await getAllMsgs());
 });
 
 server.listen(port, () => {

@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/reg', async (req: Request, res: Response) => {
 	try {
-		logger.info('reg data', req.header('Authorization'));
+		logger.info('reg data', await req.header('Authorization'));
 		const authData = req.header('Authorization');
 
 		if (!authData || authData.trim() === '') {
