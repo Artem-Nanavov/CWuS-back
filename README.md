@@ -7,7 +7,7 @@ Or leave it empty and use the [here][postgreSQL link].
 
 [postgreSQL link]: https://www.postgresql.org/download/
 
-first time
+first time:
 Run: `npm i`
 Run: `knex migrate:latest`
 Run: `npm run dev`
@@ -16,9 +16,11 @@ API port:       8000
 
 ## API endpoints
 
+
+`/auth/reg`
 ~~~~
 Description:
-    Registers new user and returns authorization token
+    Registers new user and returns cookie with refresh token and some user data
 
 Protocol:
     http
@@ -31,5 +33,28 @@ Request Header data:
     username: string
     password: string
 
-Response cookie with refresh token
+Response cookie with refresh token;
+Response data:
+	access
 ~~~~
+
+
+`/auth/login`
+~~~~~
+Description:
+    aser auth, returns cookie with token and some user data
+
+Protocol:
+    http
+
+Method:
+    POST
+
+Request Header data:
+    email: string
+    password: string
+
+Response cookie with refresh token;
+Response data:
+	access
+~~~~~
